@@ -1,0 +1,11 @@
+@use 'styles/index' as styles;
+
+.hero-delete-dialog {
+  &__content {
+    min-width: 280px;
+  }
+
+  &__actions {
+    gap: styles.$spacing-sm;
+  }
+}

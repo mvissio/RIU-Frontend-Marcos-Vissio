@@ -1,0 +1,13 @@
+@use 'styles/index' as styles;
+
+.hero-form-page {
+  @include styles.page-container;
+
+  &__header {
+    margin-bottom: styles.$spacing-lg;
+  }
+
+  &__title {
+    margin: 0;
+  }
+}

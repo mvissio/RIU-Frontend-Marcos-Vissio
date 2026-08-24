@@ -1,0 +1,17 @@
+@use 'styles/index' as styles;
+
+.hero-form {
+  display: flex;
+  flex-direction: column;
+  gap: styles.$spacing-md;
+
+  &__field {
+    width: 100%;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: styles.$spacing-sm;
+  }
+}

@@ -1,0 +1,13 @@
+<section class="hero-form-page">
+  <header class="hero-form-page__header">
+    <h1 class="hero-form-page__title">
+      {{ isEditMode ? 'Editar héroe' : 'Agregar héroe' }}
+    </h1>
+  </header>
+
+  <app-hero-form
+    [hero]="hero"
+    (save)="onSave($event)"
+    (cancel)="onCancel()"
+  />
+</section>

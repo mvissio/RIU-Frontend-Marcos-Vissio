@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: challenge-heroes
+    ports:
+      - "8080:80"
+    restart: unless-stopped

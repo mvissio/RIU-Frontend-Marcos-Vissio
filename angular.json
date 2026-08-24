@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "challenge-heros": {
+    "challenge-heroes": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -65,10 +65,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "challenge-heros:build:production"
+              "buildTarget": "challenge-heroes:build:production"
             },
             "development": {
-              "buildTarget": "challenge-heros:build:development"
+              "buildTarget": "challenge-heroes:build:development"
             }
           },
           "defaultConfiguration": "development"

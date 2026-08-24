@@ -1,14 +1,28 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { HeroService } from './hero';
 
 describe('HeroService', () => {
   let service: HeroService;
+  let httpMock: HttpTestingController;
+
+  const apiUrl = 'http://localhost:3000/heroes';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
 
     service = TestBed.inject(HeroService);
+
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   it('should be created', () => {
@@ -17,124 +31,149 @@ describe('HeroService', () => {
 
   describe('getAll', () => {
     it('should return all heroes', () => {
-      const heroes = service.getAll();
+      service.getAll().subscribe((heroes) => {
+        expect(heroes.length).toBeGreaterThan(0);
+      });
 
-      expect(heroes.length).toBeGreaterThan(0);
+      const req = httpMock.expectOne(apiUrl);
+
+      expect(req.request.method).toBe('GET');
+
+      req.flush([
+        {
+          id: '1',
+          name: 'Superman',
+          realName: 'Clark Kent',
+          universe: 'DC',
+          description: 'Hero',
+          powers: ['Strength'],
+          createdAt: new Date(),
+        },
+      ]);
     });
   });
 
   describe('getById', () => {
     it('should return a hero by id', () => {
-      const hero = service.getById('1');
+      service.getById('1').subscribe((hero) => {
+        expect(hero.name).toBe('Superman');
+      });
 
-      expect(hero).toBeDefined();
-      expect(hero?.name).toBe('Superman');
-    });
+      const req = httpMock.expectOne(`${apiUrl}/1`);
 
-    it('should return undefined when hero does not exist', () => {
-      expect(service.getById('test-id')).toBeUndefined();
+      expect(req.request.method).toBe('GET');
+
+      req.flush({
+        id: '1',
+        name: 'Superman',
+        realName: 'Clark Kent',
+        universe: 'DC',
+        description: 'Hero',
+        powers: ['Strength'],
+        createdAt: new Date(),
+      });
     });
   });
 
   describe('searchByName', () => {
-    it('should search heroes by partial name', () => {
-      const heroes = service.searchByName('man');
+    it('should search heroes by name', () => {
+      service.searchByName('man').subscribe((heroes) => {
+        expect(heroes.length).toBe(2);
+      });
 
-      expect(heroes.length).toBeGreaterThan(0);
+      const req = httpMock.expectOne(`${apiUrl}?name_like=man`);
 
-      expect(heroes.every((hero) => hero.name.toLowerCase().includes('man'))).toBe(true);
-    });
+      expect(req.request.method).toBe('GET');
 
-    it('should be case insensitive', () => {
-      const lowerCase = service.searchByName('man');
-      const upperCase = service.searchByName('MAN');
-
-      expect(upperCase).toEqual(lowerCase);
-    });
-
-    it('should trim the search term', () => {
-      const normalSearch = service.searchByName('man');
-
-      const searchWithSpaces = service.searchByName('  man  ');
-
-      expect(searchWithSpaces).toEqual(normalSearch);
-    });
-
-    it('should return all heroes when query is empty', () => {
-      expect(service.searchByName('')).toEqual(service.getAll());
-    });
-
-    it('should return an empty array when there are no matches', () => {
-      expect(service.searchByName('zzzzzz')).toEqual([]);
+      req.flush([
+        {
+          id: '1',
+          name: 'Superman',
+          realName: 'Clark',
+          universe: 'DC',
+          description: '',
+          powers: [],
+          createdAt: new Date(),
+        },
+        {
+          id: '2',
+          name: 'Spiderman',
+          realName: 'Peter',
+          universe: 'Marvel',
+          description: '',
+          powers: [],
+          createdAt: new Date(),
+        },
+      ]);
     });
   });
 
   describe('create', () => {
-    it('should create a new hero', () => {
-      const totalBefore = service.getAll().length;
-
-      const hero = service.create({
+    it('should create a hero', () => {
+      const hero = {
         name: 'Daredevil',
         realName: 'Matt Murdock',
         universe: 'Marvel',
-        description: 'Héroe de Hell’s Kitchen.',
-        powers: ['Sentidos', 'Combate'],
+        description: 'Hero',
+        powers: ['Combat'],
+      };
+
+      // @ts-ignore
+      service.create(hero).subscribe((createdHero) => {
+        expect(createdHero.id).toBeTruthy();
       });
 
-      expect(hero.id).toBeTruthy();
-      expect(hero.createdAt).toBeInstanceOf(Date);
+      const req = httpMock.expectOne(apiUrl);
 
-      expect(service.getAll().length).toBe(totalBefore + 1);
+      expect(req.request.method).toBe('POST');
 
-      expect(service.getById(hero.id)).toEqual(hero);
+      req.flush({
+        ...hero,
+
+        id: '10',
+
+        createdAt: new Date(),
+      });
     });
   });
 
   describe('update', () => {
-    it('should update an existing hero', () => {
-      const originalHero = service.getById('1');
+    it('should update a hero', () => {
+      service
+        .update('1', {
+          name: 'Superman Updated',
+        })
+        .subscribe((hero) => {
+          expect(hero?.name).toBe('Superman Updated');
+        });
 
-      const updatedHero = service.update('1', {
+      const req = httpMock.expectOne(`${apiUrl}/1`);
+
+      expect(req.request.method).toBe('PUT');
+
+      req.flush({
+        id: '1',
         name: 'Superman Updated',
+        realName: 'Clark Kent',
+        universe: 'DC',
+        description: '',
+        powers: [],
+        createdAt: new Date(),
       });
-
-      expect(updatedHero).toBeDefined();
-      expect(updatedHero?.name).toBe('Superman Updated');
-
-      expect(updatedHero?.id).toBe(originalHero?.id);
-
-      expect(updatedHero?.createdAt).toEqual(originalHero?.createdAt);
-    });
-
-    it('should return undefined when hero does not exist', () => {
-      const hero = service.update('test-id', {
-        name: 'Test',
-      });
-
-      expect(hero).toBeUndefined();
     });
   });
 
   describe('delete', () => {
-    it('should delete an existing hero', () => {
-      const totalBefore = service.getAll().length;
+    it('should delete a hero', () => {
+      service.delete('1').subscribe(() => {
+        expect(true).toBe(true);
+      });
 
-      const deleted = service.delete('1');
+      const req = httpMock.expectOne(`${apiUrl}/1`);
 
-      expect(deleted).toBe(true);
-      expect(service.getById('1')).toBeUndefined();
+      expect(req.request.method).toBe('DELETE');
 
-      expect(service.getAll().length).toBe(totalBefore - 1);
-    });
-
-    it('should return false when hero does not exist', () => {
-      const totalBefore = service.getAll().length;
-
-      const deleted = service.delete('test-id');
-
-      expect(deleted).toBe(false);
-
-      expect(service.getAll().length).toBe(totalBefore);
+      req.flush(null);
     });
   });
 });

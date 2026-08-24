@@ -1,0 +1,129 @@
+{
+  "heroes": [
+    {
+      "id": "3",
+      "name": "Spider-Man",
+      "realName": "Peter Parker",
+      "universe": "Marvel",
+      "description": "Héroe con habilidades arácnidas.",
+      "powers": [
+        "Agilidad",
+        "Sentido arácnido",
+        "Telarañas"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "Iron Man1test",
+      "realName": "Tony Stark",
+      "universe": "Marvel",
+      "description": "Héroe con armadura tecnológica.",
+      "powers": [
+        "Tecnología",
+        "Vuelo",
+        "Energía"
+      ],
+      "id": "4"
+    },
+    {
+      "id": "5",
+      "name": "Wonder Woman",
+      "realName": "Diana Prince",
+      "universe": "DC",
+      "description": "Guerrera amazona.",
+      "powers": [
+        "Fuerza",
+        "Combate",
+        "Resistencia"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "name": "Hulk",
+      "realName": "Bruce Banner",
+      "universe": "Marvel",
+      "description": "Héroe de gran fuerza física.",
+      "powers": [
+        "Fuerza",
+        "Resistencia",
+        "Regeneración"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "name": "Thor",
+      "realName": "Thor Odinson",
+      "universe": "Marvel",
+      "description": "Dios del trueno.",
+      "powers": [
+        "Rayos",
+        "Fuerza",
+        "Vuelo"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "name": "Flash",
+      "realName": "Barry Allen",
+      "universe": "DC",
+      "description": "Héroe con supervelocidad.",
+      "powers": [
+        "Velocidad",
+        "Reflejos"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "9",
+      "name": "Aquaman",
+      "realName": "Arthur Curry",
+      "universe": "DC",
+      "description": "Rey de Atlantis.",
+      "powers": [
+        "Fuerza",
+        "Habilidades acuáticas"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "10",
+      "name": "Black Widow",
+      "realName": "Natasha Romanoff",
+      "universe": "Marvel",
+      "description": "Agente y especialista en combate.",
+      "powers": [
+        "Combate",
+        "Espionaje"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "11",
+      "name": "Ant-Man",
+      "realName": "Scott Lang",
+      "universe": "Marvel",
+      "description": "Héroe capaz de cambiar de tamaño.",
+      "powers": [
+        "Cambio de tamaño",
+        "Tecnología"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "12",
+      "name": "Catwoman",
+      "realName": "Selina Kyle",
+      "universe": "DC",
+      "description": "Personaje de Gotham.",
+      "powers": [
+        "Agilidad",
+        "Sigilo"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

@@ -1,4 +1,5 @@
 services:
+
   app:
     build:
       context: ..
@@ -6,4 +7,20 @@ services:
     container_name: challenge-heroes
     ports:
       - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+
+
+  api:
+    image: clue/json-server
+    container_name: challenge-heroes-api
+    ports:
+      - "3000:80"
+    volumes:
+      - ../mock-api/db.json:/data/db.json
+    command:
+      - --host
+      - 0.0.0.0
+      - /data/db.json
     restart: unless-stopped

@@ -1,76 +1,45 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import { HEROES_SEED } from '../data/heroes.seed';
+import { Observable } from 'rxjs';
+
 import { CreateHero, Hero, UpdateHero } from '../models/hero.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeroService {
-  private readonly heroesState = signal<Hero[]>([...HEROES_SEED]);
+  private readonly http = inject(HttpClient);
 
-  readonly heroes = this.heroesState.asReadonly();
+  private readonly apiUrl = `${environment.apiUrl}/heroes`;
 
-  getAll(): Hero[] {
-    return this.heroesState();
+  getAll(): Observable<Hero[]> {
+    return this.http.get<Hero[]>(this.apiUrl);
   }
 
-  getById(id: string): Hero | undefined {
-    return this.heroesState().find((hero) => hero.id === id);
+  getById(id: string): Observable<Hero> {
+    return this.http.get<Hero>(`${this.apiUrl}/${id}`);
   }
 
-  searchByName(query: string): Hero[] {
-    const searchTerm = query.trim().toLowerCase();
+  searchByName(query: string): Observable<Hero[]> {
+    const searchTerm = query.trim();
 
-    if (!searchTerm) {
-      return this.getAll();
-    }
-
-    return this.heroesState().filter((hero) => hero.name.toLowerCase().includes(searchTerm));
+    return this.http.get<Hero[]>(`${this.apiUrl}?name_like=${searchTerm}`);
   }
 
-  create(hero: CreateHero): Hero {
-    const newHero = {
+  create(hero: CreateHero): Observable<Hero> {
+    return this.http.post<Hero>(this.apiUrl, {
       ...hero,
-      id: crypto.randomUUID(),
       createdAt: new Date(),
-    };
-
-    this.heroesState.update((heroes) => [...heroes, newHero]);
-
-    return newHero;
+    });
   }
 
-  update(id: string, changes: UpdateHero): Hero | undefined {
-    const currentHero = this.getById(id);
-
-    if (!currentHero) {
-      return undefined;
-    }
-
-    const updatedHero = {
-      ...currentHero,
-      ...changes,
-      id: currentHero.id,
-      createdAt: currentHero.createdAt,
-    };
-
-    this.heroesState.update((heroes) =>
-      heroes.map((hero) => (hero.id === id ? updatedHero : hero)),
-    );
-
-    return updatedHero;
+  update(id: string, changes: UpdateHero): Observable<Hero | null> {
+    return this.http.put<Hero>(`${this.apiUrl}/${id}`, changes);
   }
 
-  delete(id: string): boolean {
-    const exists = this.heroesState().some((hero) => hero.id === id);
-
-    if (!exists) {
-      return false;
-    }
-
-    this.heroesState.update((heroes) => heroes.filter((hero) => hero.id !== id));
-
-    return true;
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

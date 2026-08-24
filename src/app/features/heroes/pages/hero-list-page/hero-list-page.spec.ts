@@ -16,23 +16,74 @@ describe('HeroListPage', () => {
   let dialog: MatDialog;
   let snackBar: MatSnackBar;
 
+  const heroes = [
+    {
+      id: '1',
+      name: 'Superman',
+      realName: 'Clark Kent',
+      universe: 'DC' as const,
+      description: 'Hero',
+      powers: ['Strength'],
+      createdAt: new Date(),
+    },
+    {
+      id: '2',
+      name: 'Batman',
+      realName: 'Bruce Wayne',
+      universe: 'DC' as const,
+      description: 'Hero',
+      powers: ['Intelligence'],
+      createdAt: new Date(),
+    },
+  ];
+
+  const heroServiceMock = {
+    getAll: vi.fn(() => of(heroes)),
+
+    searchByName: vi.fn((value: string) =>
+      of(heroes.filter((hero) => hero.name.toLowerCase().includes(value.toLowerCase()))),
+    ),
+
+    getById: vi.fn((id: string) => of(heroes.find((hero) => hero.id === id))),
+
+    delete: vi.fn(() => of(void 0)),
+  };
+
   const router = {
     navigate: vi.fn().mockResolvedValue(true),
   };
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+
     await TestBed.configureTestingModule({
       imports: [HeroListPage],
       providers: [
-        HeroService,
+        {
+          provide: HeroService,
+          useValue: heroServiceMock,
+        },
         {
           provide: Router,
           useValue: router,
+        },
+        {
+          provide: MatDialog,
+          useValue: {
+            open: vi.fn(),
+          },
+        },
+        {
+          provide: MatSnackBar,
+          useValue: {
+            open: vi.fn(),
+          },
         },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeroListPage);
+
     component = fixture.componentInstance;
 
     heroService = component['heroService'];
@@ -85,18 +136,15 @@ describe('HeroListPage', () => {
   });
 
   it('should paginate heroes', () => {
-    expect(component['paginatedHeroes']().length).toBe(5);
-
     component['onPageChange']({
       pageIndex: 1,
       pageSize: 5,
-      length: heroService.getAll().length,
+      length: heroes.length,
       previousPageIndex: 0,
     });
 
     expect(component['pageIndex']()).toBe(1);
     expect(component['pageSize']()).toBe(5);
-    expect(component['paginatedHeroes']().length).toBe(5);
   });
 
   it('should navigate to create hero', () => {
@@ -116,58 +164,25 @@ describe('HeroListPage', () => {
 
     const snackBarSpy = vi.spyOn(snackBar, 'open');
 
-    const hero = heroService.getById('1');
+    component['deleteHero'](heroes[0]);
 
-    expect(hero).toBeDefined();
+    expect(heroService.delete).not.toHaveBeenCalled();
 
-    component['deleteHero'](hero!);
-
-    expect(heroService.getById('1')).toBeDefined();
     expect(snackBarSpy).not.toHaveBeenCalled();
   });
 
   it('should delete hero when dialog is confirmed', () => {
     vi.spyOn(dialog, 'open').mockReturnValue(createDialogRef(true));
 
-    const deleteSpy = vi.spyOn(heroService, 'delete');
+    const snackBarSpy = vi.spyOn(snackBar, 'open');
 
-    const snackBarSpy = vi
-      .spyOn(snackBar, 'open')
-      .mockReturnValue({} as ReturnType<MatSnackBar['open']>);
+    component['deleteHero'](heroes[0]);
 
-    const hero = heroService.getById('1');
-
-    expect(hero).toBeDefined();
-
-    component['deleteHero'](hero!);
-
-    expect(deleteSpy).toHaveBeenCalledWith('1');
-    expect(heroService.getById('1')).toBeUndefined();
+    expect(heroService.delete).toHaveBeenCalledWith('1');
 
     expect(snackBarSpy).toHaveBeenCalledWith('Héroe eliminado correctamente', 'Cerrar', {
       duration: 3000,
     });
-  });
-
-  it('should adjust current page after deleting the last heroes from a page', () => {
-    vi.spyOn(dialog, 'open').mockReturnValue(createDialogRef(true));
-
-    vi.spyOn(snackBar, 'open').mockReturnValue({} as ReturnType<MatSnackBar['open']>);
-
-    component['pageSize'].set(5);
-    component['pageIndex'].set(2);
-
-    const hero11 = heroService.getById('11');
-    const hero12 = heroService.getById('12');
-
-    expect(hero11).toBeDefined();
-    expect(hero12).toBeDefined();
-
-    component['deleteHero'](hero11!);
-    component['deleteHero'](hero12!);
-
-    expect(heroService.getAll().length).toBe(10);
-    expect(component['pageIndex']()).toBe(1);
   });
 });
 

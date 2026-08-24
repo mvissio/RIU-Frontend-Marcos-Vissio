@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,7 +28,7 @@ import { HeroDeleteDialog } from '../../components/hero-delete-dialog/hero-delet
   templateUrl: './hero-list-page.html',
   styleUrl: './hero-list-page.scss',
 })
-export class HeroListPage {
+export class HeroListPage implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
@@ -37,12 +37,23 @@ export class HeroListPage {
   protected readonly searchTerm = signal('');
   protected readonly pageIndex = signal(0);
   protected readonly pageSize = signal(5);
+  protected readonly heroes = signal<Hero[]>([]);
 
   protected readonly displayedColumns = ['name', 'realName', 'universe', 'powers', 'actions'];
 
-  protected readonly filteredHeroes = computed(() =>
-    this.heroService.searchByName(this.searchTerm()),
-  );
+  ngOnInit(): void {
+    this.loadHeroes();
+  }
+
+  protected readonly filteredHeroes = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+
+    if (!term) {
+      return this.heroes();
+    }
+
+    return this.heroes().filter((hero) => hero.name.toLowerCase().includes(term));
+  });
 
   protected readonly paginatedHeroes = computed(() => {
     const heroes = this.filteredHeroes();
@@ -88,20 +99,17 @@ export class HeroListPage {
         return;
       }
 
-      const deleted = this.heroService.delete(hero.id);
+      this.heroService.delete(hero.id).subscribe(() => {
+        this.loadHeroes();
 
-      if (!deleted) {
-        return;
-      }
+        this.adjustCurrentPage();
 
-      this.adjustCurrentPage();
-
-      this.snackBar.open('Héroe eliminado correctamente', 'Cerrar', {
-        duration: 3000,
+        this.snackBar.open('Héroe eliminado correctamente', 'Cerrar', {
+          duration: 3000,
+        });
       });
     });
   }
-
   private adjustCurrentPage(): void {
     const totalHeroes = this.filteredHeroes().length;
 
@@ -110,5 +118,11 @@ export class HeroListPage {
     if (this.pageIndex() > lastPageIndex) {
       this.pageIndex.set(lastPageIndex);
     }
+  }
+
+  private loadHeroes(): void {
+    this.heroService.getAll().subscribe((heroes) => {
+      this.heroes.set(heroes);
+    });
   }
 }

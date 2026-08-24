@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 import { CreateHero, Hero, HeroUniverse } from '../../../../core/models/hero.model';
+import { UppercaseDirective } from '../../../../shared/directives/uppercase';
 
 @Component({
   selector: 'app-hero-form',
@@ -15,6 +16,7 @@ import { CreateHero, Hero, HeroUniverse } from '../../../../core/models/hero.mod
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    UppercaseDirective,
   ],
   templateUrl: './hero-form.html',
   styleUrl: './hero-form.scss',

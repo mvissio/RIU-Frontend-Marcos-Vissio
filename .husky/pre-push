@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "Running tests with coverage..."
+
+npm run test:coverage
+
+if [ $? -ne 0 ]; then
+  echo "Tests or coverage validation failed."
+  exit 1
+fi
+
+echo "Pre-push checks passed."

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "Running Prettier check..."
+
+npm run format:check
+
+if [ $? -ne 0 ]; then
+  echo "Prettier validation failed."
+  echo "Run 'npm run format' to fix formatting issues."
+  exit 1
+fi
+
+echo "Pre-commit checks passed."

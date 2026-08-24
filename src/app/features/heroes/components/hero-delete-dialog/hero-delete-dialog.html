@@ -1,32 +1,13 @@
-<h2
-  mat-dialog-title
-  class="hero-delete-dialog__title"
->
-  Eliminar héroe
-</h2>
+<h2 mat-dialog-title class="hero-delete-dialog__title">Eliminar héroe</h2>
 
 <mat-dialog-content class="hero-delete-dialog__content">
   ¿Seguro que querés eliminar a
-  <strong>{{ hero.name }}</strong>?
+  <strong>{{ hero.name }}</strong
+  >?
 </mat-dialog-content>
 
-<mat-dialog-actions
-  align="end"
-  class="hero-delete-dialog__actions"
->
-  <button
-    type="button"
-    mat-button
-    (click)="cancel()"
-  >
-    Cancelar
-  </button>
+<mat-dialog-actions align="end" class="hero-delete-dialog__actions">
+  <button type="button" mat-button (click)="cancel()">Cancelar</button>
 
-  <button
-    type="button"
-    mat-flat-button
-    (click)="confirm()"
-  >
-    Eliminar
-  </button>
+  <button type="button" mat-flat-button (click)="confirm()">Eliminar</button>
 </mat-dialog-actions>

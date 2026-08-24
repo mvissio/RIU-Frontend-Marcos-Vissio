@@ -105,7 +105,6 @@ describe('HeroFormPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/heroes']);
   });
 
-
   it('should show an error when update fails', async () => {
     await createComponent({
       id: '1',
@@ -121,7 +120,6 @@ describe('HeroFormPage', () => {
 
     expect(router.navigate).not.toHaveBeenCalled();
   });
-
 
   it('should navigate to the list when cancelling', async () => {
     await createComponent();

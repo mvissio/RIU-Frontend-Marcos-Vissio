@@ -49,4 +49,5 @@ describe('loadingInterceptor', () => {
     expect(loadingService.show).toHaveBeenCalled();
 
     expect(loadingService.hide).toHaveBeenCalled();
-  });});
+  });
+});

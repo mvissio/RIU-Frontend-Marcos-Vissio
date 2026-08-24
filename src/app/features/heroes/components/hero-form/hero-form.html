@@ -1,51 +1,29 @@
-<form
-  class="hero-form"
-  [formGroup]="form"
-  (ngSubmit)="submit()"
->
-  <mat-form-field
-    class="hero-form__field"
-    appearance="outline"
-  >
+<form class="hero-form" [formGroup]="form" (ngSubmit)="submit()">
+  <mat-form-field class="hero-form__field" appearance="outline">
     <mat-label>Nombre</mat-label>
 
-    <input
-      matInput
-      formControlName="name"
-      uppercase
-    />
+    <input matInput formControlName="name" uppercase />
 
     @if (form.controls.name.hasError('required')) {
       <mat-error>El nombre es obligatorio</mat-error>
     }
 
     @if (form.controls.name.hasError('minlength')) {
-      <mat-error>
-        El nombre debe tener al menos 2 caracteres
-      </mat-error>
+      <mat-error> El nombre debe tener al menos 2 caracteres </mat-error>
     }
   </mat-form-field>
 
-  <mat-form-field
-    class="hero-form__field"
-    appearance="outline"
-  >
+  <mat-form-field class="hero-form__field" appearance="outline">
     <mat-label>Nombre real</mat-label>
 
-    <input
-      matInput
-      formControlName="realName"
-    />
+    <input matInput formControlName="realName" />
 
     @if (form.controls.realName.hasError('required')) {
       <mat-error>El nombre real es obligatorio</mat-error>
     }
   </mat-form-field>
 
-  <mat-form-field
-    class="hero-form__field"
-    appearance="outline"
-  >
+  <mat-form-field class="hero-form__field" appearance="outline">
     <mat-label>Universo</mat-label>
 
     <mat-select formControlName="universe">
@@ -57,52 +35,27 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field
-    class="hero-form__field"
-    appearance="outline"
-  >
+  <mat-form-field class="hero-form__field" appearance="outline">
     <mat-label>Descripción</mat-label>
 
-    <textarea
-      matInput
-      rows="4"
-      formControlName="description"
-    ></textarea>
+    <textarea matInput rows="4" formControlName="description"></textarea>
 
     @if (form.controls.description.hasError('required')) {
       <mat-error>La descripción es obligatoria</mat-error>
     }
   </mat-form-field>
 
-  <mat-form-field
-    class="hero-form__field"
-    appearance="outline"
-  >
+  <mat-form-field class="hero-form__field" appearance="outline">
     <mat-label>Poderes</mat-label>
 
-    <input
-      matInput
-      formControlName="powers"
-      placeholder="Vuelo, fuerza, velocidad"
-    />
+    <input matInput formControlName="powers" placeholder="Vuelo, fuerza, velocidad" />
 
     <mat-hint>Separados por coma</mat-hint>
   </mat-form-field>
 
   <div class="hero-form__actions">
-    <button
-      type="button"
-      mat-button
-      (click)="cancel.emit()"
-    >
-      Cancelar
-    </button>
+    <button type="button" mat-button (click)="cancel.emit()">Cancelar</button>
 
-    <button
-      type="submit"
-      mat-flat-button
-    >
-      Guardar
-    </button>
+    <button type="submit" mat-flat-button>Guardar</button>
   </div>
 </form>

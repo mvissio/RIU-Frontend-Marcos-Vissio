@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -20,20 +20,29 @@ export class HeroFormPage {
 
   protected readonly heroId = this.route.snapshot.paramMap.get('id');
 
-  protected readonly hero: Hero | null = this.heroId
-    ? (this.heroService.getById(this.heroId) ?? null)
-    : null;
+  protected readonly hero = signal<Hero | null>(null);
 
   protected readonly isEditMode = this.heroId !== null;
 
   constructor() {
-    if (this.isEditMode && !this.hero) {
-      this.snackBar.open('El héroe no existe', 'Cerrar', {
-        duration: 3000,
-      });
-
-      void this.router.navigate(['/heroes']);
+    if (this.isEditMode && this.heroId) {
+      this.loadHero(this.heroId);
     }
+  }
+
+  private loadHero(id: string): void {
+    this.heroService.getById(id).subscribe({
+      next: (hero) => {
+        this.hero.set(hero);
+      },
+      error: () => {
+        this.snackBar.open('El héroe no existe', 'Cerrar', {
+          duration: 3000,
+        });
+
+        void this.router.navigate(['/heroes']);
+      },
+    });
   }
 
   protected onSave(hero: CreateHero): void {
@@ -50,30 +59,30 @@ export class HeroFormPage {
   }
 
   private createHero(hero: CreateHero): void {
-    this.heroService.create(hero);
-
-    this.snackBar.open('Héroe creado correctamente', 'Cerrar', {
-      duration: 3000,
-    });
-
-    void this.router.navigate(['/heroes']);
-  }
-
-  private updateHero(id: string, hero: CreateHero): void {
-    const updatedHero = this.heroService.update(id, hero);
-
-    if (!updatedHero) {
-      this.snackBar.open('No se pudo actualizar el héroe', 'Cerrar', {
+    this.heroService.create(hero).subscribe(() => {
+      this.snackBar.open('Héroe creado correctamente', 'Cerrar', {
         duration: 3000,
       });
 
-      return;
-    }
-
-    this.snackBar.open('Héroe actualizado correctamente', 'Cerrar', {
-      duration: 3000,
+      void this.router.navigate(['/heroes']);
     });
+  }
 
-    void this.router.navigate(['/heroes']);
+  private updateHero(id: string, hero: CreateHero): void {
+    this.heroService.update(id, hero).subscribe({
+      next: () => {
+        this.snackBar.open('Héroe actualizado correctamente', 'Cerrar', {
+          duration: 3000,
+        });
+
+        void this.router.navigate(['/heroes']);
+      },
+
+      error: () => {
+        this.snackBar.open('No se pudo actualizar el héroe', 'Cerrar', {
+          duration: 3000,
+        });
+      },
+    });
   }
 }

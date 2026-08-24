@@ -47,30 +47,25 @@ export class HeroListPage implements OnInit {
 
   protected readonly filteredHeroes = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-
     if (!term) {
       return this.heroes();
     }
-
     return this.heroes().filter((hero) => hero.name.toLowerCase().includes(term));
   });
 
   protected readonly paginatedHeroes = computed(() => {
     const heroes = this.filteredHeroes();
     const pageSize = this.pageSize();
-
     const maxPageIndex = Math.max(Math.ceil(heroes.length / pageSize) - 1, 0);
-
     const currentPageIndex = Math.min(this.pageIndex(), maxPageIndex);
-
     const start = currentPageIndex * pageSize;
-
     return heroes.slice(start, start + pageSize);
   });
 
   protected onSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
-
+    // Toda búsqueda vuelve a la primera página para no quedar en un rango vacío
+    // Agregado ya que fallaba al buscar y estar en una pagina mayor
     this.pageIndex.set(0);
     this.searchTerm.set(input.value);
   }
@@ -101,20 +96,17 @@ export class HeroListPage implements OnInit {
 
       this.heroService.delete(hero.id).subscribe(() => {
         this.loadHeroes();
-
         this.adjustCurrentPage();
-
         this.snackBar.open('Héroe eliminado correctamente', 'Cerrar', {
           duration: 3000,
         });
       });
     });
   }
+  // Si se borra el último héroe de la última página, retrocede una página
   private adjustCurrentPage(): void {
     const totalHeroes = this.filteredHeroes().length;
-
     const lastPageIndex = Math.max(Math.ceil(totalHeroes / this.pageSize()) - 1, 0);
-
     if (this.pageIndex() > lastPageIndex) {
       this.pageIndex.set(lastPageIndex);
     }

@@ -17,11 +17,8 @@ export class HeroFormPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-
   protected readonly heroId = this.route.snapshot.paramMap.get('id');
-
   protected readonly hero = signal<Hero | null>(null);
-
   protected readonly isEditMode = this.heroId !== null;
 
   constructor() {
@@ -39,7 +36,6 @@ export class HeroFormPage {
         this.snackBar.open('El héroe no existe', 'Cerrar', {
           duration: 3000,
         });
-
         void this.router.navigate(['/heroes']);
       },
     });
@@ -50,7 +46,6 @@ export class HeroFormPage {
       this.updateHero(this.heroId, hero);
       return;
     }
-
     this.createHero(hero);
   }
 
@@ -63,7 +58,6 @@ export class HeroFormPage {
       this.snackBar.open('Héroe creado correctamente', 'Cerrar', {
         duration: 3000,
       });
-
       void this.router.navigate(['/heroes']);
     });
   }
@@ -74,10 +68,8 @@ export class HeroFormPage {
         this.snackBar.open('Héroe actualizado correctamente', 'Cerrar', {
           duration: 3000,
         });
-
         void this.router.navigate(['/heroes']);
       },
-
       error: () => {
         this.snackBar.open('No se pudo actualizar el héroe', 'Cerrar', {
           duration: 3000,

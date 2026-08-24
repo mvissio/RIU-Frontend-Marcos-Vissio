@@ -23,8 +23,8 @@ export class HeroService {
   }
 
   searchByName(query: string): Observable<Hero[]> {
+    // name_like Es requerido para la busqueda con JsonServer
     const searchTerm = query.trim();
-
     return this.http.get<Hero[]>(`${this.apiUrl}?name_like=${searchTerm}`);
   }
 

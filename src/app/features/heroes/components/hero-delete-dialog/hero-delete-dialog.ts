@@ -12,7 +12,6 @@ import { Hero } from '../../../../core/models/hero.model';
 })
 export class HeroDeleteDialog {
   private readonly dialogRef = inject<MatDialogRef<HeroDeleteDialog, boolean>>(MatDialogRef);
-
   protected readonly hero = inject<Hero>(MAT_DIALOG_DATA);
 
   protected confirm(): void {

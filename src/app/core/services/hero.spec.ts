@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { HeroService } from './hero';
+import { CreateHero } from '../models/hero.model';
 
 describe('HeroService', () => {
   let service: HeroService;
@@ -110,7 +111,7 @@ describe('HeroService', () => {
 
   describe('create', () => {
     it('should create a hero', () => {
-      const hero = {
+      const hero: CreateHero = {
         name: 'Daredevil',
         realName: 'Matt Murdock',
         universe: 'Marvel',
@@ -118,7 +119,6 @@ describe('HeroService', () => {
         powers: ['Combat'],
       };
 
-      // @ts-ignore
       service.create(hero).subscribe((createdHero) => {
         expect(createdHero.id).toBeTruthy();
       });
@@ -129,9 +129,7 @@ describe('HeroService', () => {
 
       req.flush({
         ...hero,
-
         id: '10',
-
         createdAt: new Date(),
       });
     });

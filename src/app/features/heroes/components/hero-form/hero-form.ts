@@ -33,22 +33,18 @@ export class HeroForm {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
     }),
-
     realName: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(50)],
     }),
-
     universe: new FormControl<HeroUniverse>('Marvel', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-
     description: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(10), Validators.maxLength(500)],
     }),
-
     powers: new FormControl('', {
       nonNullable: true,
     }),
@@ -56,7 +52,6 @@ export class HeroForm {
 
   private readonly populateFormEffect = effect(() => {
     const hero = this.hero();
-
     if (!hero) {
       this.form.reset({
         name: '',

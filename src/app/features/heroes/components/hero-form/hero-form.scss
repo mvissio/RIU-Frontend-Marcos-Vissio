@@ -16,7 +16,6 @@
   }
 
   @include styles.mobile {
-
     &__actions {
       flex-direction: column-reverse;
       align-items: stretch;

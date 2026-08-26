@@ -3,7 +3,6 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '../services/notification';
 
-// Interceptor para errores generales, no requerido pero funcional
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notification = inject(NotificationService);
 

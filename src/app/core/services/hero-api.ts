@@ -10,36 +10,34 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class HeroApiService {
-  private readonly http = inject(HttpClient);
-
-  private readonly apiUrl = `${environment.apiUrl}/heroes`;
+  private readonly _http = inject(HttpClient);
+  private readonly _apiUrl = `${environment.apiUrl}/heroes`;
 
   getAll(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.apiUrl);
+    return this._http.get<Hero[]>(this._apiUrl);
   }
 
   getById(id: string): Observable<Hero> {
-    return this.http.get<Hero>(`${this.apiUrl}/${id}`);
+    return this._http.get<Hero>(`${this._apiUrl}/${id}`);
   }
 
   searchByName(query: string): Observable<Hero[]> {
-    // name_like Es requerido para la busqueda con JsonServer
     const searchTerm = query.trim();
-    return this.http.get<Hero[]>(`${this.apiUrl}?name_like=${searchTerm}`);
+    return this._http.get<Hero[]>(`${this._apiUrl}?name_like=${searchTerm}`);
   }
 
   create(hero: CreateHero): Observable<Hero> {
-    return this.http.post<Hero>(this.apiUrl, {
+    return this._http.post<Hero>(this._apiUrl, {
       ...hero,
       createdAt: new Date(),
     });
   }
 
   update(id: string, changes: UpdateHero): Observable<Hero | null> {
-    return this.http.put<Hero>(`${this.apiUrl}/${id}`, changes);
+    return this._http.put<Hero>(`${this._apiUrl}/${id}`, changes);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this._http.delete<void>(`${this._apiUrl}/${id}`);
   }
 }

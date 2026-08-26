@@ -5,10 +5,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   providedIn: 'root',
 })
 export class NotificationService {
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly _snackBar = inject(MatSnackBar);
 
   show(message: string): void {
-    this.snackBar.open(message, 'Cerrar', {
+    this._snackBar.open(message, 'Cerrar', {
       duration: 3000,
     });
   }

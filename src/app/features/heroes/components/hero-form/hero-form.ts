@@ -51,7 +51,7 @@ export class HeroForm {
     }),
   });
 
-  private readonly populateFormEffect = effect(() => {
+  private readonly _populateFormEffect = effect(() => {
     const hero = this.hero();
     if (!hero) {
       this.form.reset({

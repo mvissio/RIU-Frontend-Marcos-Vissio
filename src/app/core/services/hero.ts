@@ -9,14 +9,14 @@ import idGenerator from '../../shared/helpers/id-generator';
   providedIn: 'root',
 })
 export class HeroService {
-  private readonly heroes = signal<Hero[]>([...HEROES_SEED]);
+  private readonly _heroes = signal<Hero[]>([...HEROES_SEED]);
 
   getAll(): Observable<Hero[]> {
-    return of(this.heroes());
+    return of(this._heroes());
   }
 
   getById(id: string): Observable<Hero> {
-    const hero = this.heroes().find((hero) => hero.id === id);
+    const hero = this._heroes().find((hero) => hero.id === id);
 
     if (!hero) {
       return throwError(() => new Error('Hero not found'));
@@ -32,7 +32,7 @@ export class HeroService {
       return this.getAll();
     }
 
-    const heroes = this.heroes().filter((hero) => hero.name.toLowerCase().includes(searchTerm));
+    const heroes = this._heroes().filter((hero) => hero.name.toLowerCase().includes(searchTerm));
 
     return of(heroes);
   }
@@ -44,13 +44,13 @@ export class HeroService {
       createdAt: new Date(),
     };
 
-    this.heroes.update((heroes) => [...heroes, newHero]);
+    this._heroes.update((heroes) => [...heroes, newHero]);
 
     return of(newHero);
   }
 
   update(id: string, changes: UpdateHero): Observable<Hero> {
-    const hero = this.heroes().find((hero) => hero.id === id);
+    const hero = this._heroes().find((hero) => hero.id === id);
 
     if (!hero) {
       return throwError(() => new Error('Hero not found'));
@@ -63,19 +63,19 @@ export class HeroService {
       createdAt: hero.createdAt,
     };
 
-    this.heroes.update((heroes) => heroes.map((hero) => (hero.id === id ? updatedHero : hero)));
+    this._heroes.update((heroes) => heroes.map((hero) => (hero.id === id ? updatedHero : hero)));
 
     return of(updatedHero);
   }
 
   delete(id: string): Observable<void> {
-    const heroExists = this.heroes().some((hero) => hero.id === id);
+    const heroExists = this._heroes().some((hero) => hero.id === id);
 
     if (!heroExists) {
       return throwError(() => new Error('Hero not found'));
     }
 
-    this.heroes.update((heroes) => heroes.filter((hero) => hero.id !== id));
+    this._heroes.update((heroes) => heroes.filter((hero) => hero.id !== id));
 
     return of(undefined);
   }

@@ -12,14 +12,14 @@ import { Hero } from '../../../../core/models/hero.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroDeleteDialog {
-  private readonly dialogRef = inject<MatDialogRef<HeroDeleteDialog, boolean>>(MatDialogRef);
+  private readonly _dialogRef = inject<MatDialogRef<HeroDeleteDialog, boolean>>(MatDialogRef);
   protected readonly hero = inject<Hero>(MAT_DIALOG_DATA);
 
   protected confirm(): void {
-    this.dialogRef.close(true);
+    this._dialogRef.close(true);
   }
 
   protected cancel(): void {
-    this.dialogRef.close(false);
+    this._dialogRef.close(false);
   }
 }

@@ -57,6 +57,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "api": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.api.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -69,6 +80,9 @@
             },
             "development": {
               "buildTarget": "challenge-heroes:build:development"
+            },
+            "api": {
+              "buildTarget": "challenge-heroes:build:api"
             }
           },
           "defaultConfiguration": "development"

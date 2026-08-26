@@ -10,4 +10,9 @@
   &__title {
     margin: 0;
   }
+  @include styles.mobile{
+    &__title {
+      text-align: center;
+    }
+  }
 }

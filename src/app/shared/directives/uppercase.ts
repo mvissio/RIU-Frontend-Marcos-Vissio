@@ -4,10 +4,17 @@ import { Directive, ElementRef, HostListener, inject } from '@angular/core';
   selector: '[uppercase]',
 })
 export class UppercaseDirective {
-  private el = inject(ElementRef);
+  private readonly el = inject(ElementRef<HTMLInputElement>);
 
   @HostListener('input')
   onInput() {
-    this.el.nativeElement.value = this.el.nativeElement.value.toUpperCase();
+    const input = this.el.nativeElement;
+    const uppercaseValue = input.value.toUpperCase();
+
+    if (input.value === uppercaseValue) {
+      return;
+    }
+    input.value = uppercaseValue;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }

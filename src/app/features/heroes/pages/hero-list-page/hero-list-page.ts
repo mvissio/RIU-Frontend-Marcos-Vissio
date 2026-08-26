@@ -1,4 +1,12 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -29,6 +37,7 @@ import { filter, switchMap } from 'rxjs';
   ],
   templateUrl: './hero-list-page.html',
   styleUrl: './hero-list-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroListPage implements OnInit {
   private readonly heroService = inject(HeroService);
@@ -48,16 +57,8 @@ export class HeroListPage implements OnInit {
     this.loadHeroes();
   }
 
-  protected readonly filteredHeroes = computed(() => {
-    const term = this.searchTerm().trim().toLowerCase();
-    if (!term) {
-      return this.heroes();
-    }
-    return this.heroes().filter((hero) => hero.name.toLowerCase().includes(term));
-  });
-
   protected readonly paginatedHeroes = computed(() => {
-    const heroes = this.filteredHeroes();
+    const heroes = this.heroes();
     const pageSize = this.pageSize();
     const maxPageIndex = Math.max(Math.ceil(heroes.length / pageSize) - 1, 0);
     const currentPageIndex = Math.min(this.pageIndex(), maxPageIndex);
@@ -71,6 +72,7 @@ export class HeroListPage implements OnInit {
     // Agregado ya que fallaba al buscar y estar en una pagina mayor
     this.pageIndex.set(0);
     this.searchTerm.set(input.value);
+    this.loadHeroes(input.value);
   }
 
   protected onPageChange(event: PageEvent): void {
@@ -100,7 +102,7 @@ export class HeroListPage implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
-        this.loadHeroes();
+        this.loadHeroes(this.searchTerm());
         this.adjustCurrentPage();
         this.snackBar.open('Héroe eliminado correctamente', 'Cerrar', {
           duration: 3000,
@@ -109,19 +111,20 @@ export class HeroListPage implements OnInit {
   }
   // Si se borra el último héroe de la última página, retrocede una página
   private adjustCurrentPage(): void {
-    const totalHeroes = this.filteredHeroes().length;
+    const totalHeroes = this.heroes().length;
     const lastPageIndex = Math.max(Math.ceil(totalHeroes / this.pageSize()) - 1, 0);
     if (this.pageIndex() > lastPageIndex) {
       this.pageIndex.set(lastPageIndex);
     }
   }
 
-  private loadHeroes(): void {
-    this.heroService
-      .getAll()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((heroes) => {
-        this.heroes.set(heroes);
-      });
+  private loadHeroes(searchTerm = ''): void {
+    const heroes$ = searchTerm.trim()
+      ? this.heroService.searchByName(searchTerm)
+      : this.heroService.getAll();
+
+    heroes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((heroes) => {
+      this.heroes.set(heroes);
+    });
   }
 }

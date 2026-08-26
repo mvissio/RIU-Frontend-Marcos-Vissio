@@ -46,8 +46,7 @@ describe('loadingInterceptor', () => {
       });
     });
 
-    expect(loadingService.show).toHaveBeenCalled();
-
-    expect(loadingService.hide).toHaveBeenCalled();
+    expect(loadingService.show).toHaveBeenCalledOnce();
+    expect(loadingService.hide).toHaveBeenCalledOnce();
   });
 });

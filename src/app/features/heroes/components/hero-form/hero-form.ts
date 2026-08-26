@@ -1,4 +1,4 @@
-import { Component, effect, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +20,7 @@ import { UppercaseDirective } from '../../../../shared/directives/uppercase';
   ],
   templateUrl: './hero-form.html',
   styleUrl: './hero-form.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroForm {
   readonly hero = input<Hero | null>(null);

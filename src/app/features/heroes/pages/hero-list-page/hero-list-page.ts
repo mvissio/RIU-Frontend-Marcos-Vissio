@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,8 @@ import { Router } from '@angular/router';
 import { Hero } from '../../../../core/models/hero.model';
 import { HeroService } from '../../../../core/services/hero';
 import { HeroDeleteDialog } from '../../components/hero-delete-dialog/hero-delete-dialog';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-hero-list-page',
@@ -33,6 +35,7 @@ export class HeroListPage implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly searchTerm = signal('');
   protected readonly pageIndex = signal(0);
@@ -89,19 +92,20 @@ export class HeroListPage implements OnInit {
       data: hero,
     });
 
-    dialogRef.afterClosed().subscribe((confirmed) => {
-      if (!confirmed) {
-        return;
-      }
-
-      this.heroService.delete(hero.id).subscribe(() => {
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter((confirmed) => confirmed),
+        switchMap(() => this.heroService.delete(hero.id)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
         this.loadHeroes();
         this.adjustCurrentPage();
         this.snackBar.open('Héroe eliminado correctamente', 'Cerrar', {
           duration: 3000,
         });
       });
-    });
   }
   // Si se borra el último héroe de la última página, retrocede una página
   private adjustCurrentPage(): void {
@@ -113,8 +117,11 @@ export class HeroListPage implements OnInit {
   }
 
   private loadHeroes(): void {
-    this.heroService.getAll().subscribe((heroes) => {
-      this.heroes.set(heroes);
-    });
+    this.heroService
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((heroes) => {
+        this.heroes.set(heroes);
+      });
   }
 }

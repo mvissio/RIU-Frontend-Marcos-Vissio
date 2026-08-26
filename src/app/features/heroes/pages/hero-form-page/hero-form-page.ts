@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [HeroForm, MatSnackBarModule],
   templateUrl: './hero-form-page.html',
   styleUrl: './hero-form-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroFormPage {
   private readonly heroService = inject(HeroService);

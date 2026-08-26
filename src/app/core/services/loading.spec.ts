@@ -23,9 +23,18 @@ describe('LoadingService', () => {
 
   it('should set loading state to false when hide is called', () => {
     service.show();
-
     service.hide();
 
+    expect(service.loading()).toBe(false);
+  });
+
+  it('should keep loading multi loading', () => {
+    service.show();
+    service.show();
+    service.hide();
+    expect(service.loading()).toBe(true);
+
+    service.hide();
     expect(service.loading()).toBe(false);
   });
 });

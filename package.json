@@ -4,8 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
     "api": "json-server --watch mock-api/db.json --port 3000",
+    "start:api": "concurrently \"npm run api\" \"ng serve --configuration api\"",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --no-watch --coverage",

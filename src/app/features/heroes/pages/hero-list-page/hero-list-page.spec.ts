@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 
 import { HeroService } from '../../../../core/services/hero';
+import { NotificationService } from '../../../../core/services/notification';
 import { HeroDeleteDialog } from '../../components/hero-delete-dialog/hero-delete-dialog';
 import { HeroListPage } from './hero-list-page';
 
@@ -14,7 +14,7 @@ describe('HeroListPage', () => {
 
   let heroService: HeroService;
   let dialog: MatDialog;
-  let snackBar: MatSnackBar;
+  let notificationService: NotificationService;
 
   const heroes = [
     {
@@ -53,6 +53,10 @@ describe('HeroListPage', () => {
     navigate: vi.fn().mockResolvedValue(true),
   };
 
+  const notificationServiceMock = {
+    show: vi.fn(),
+  };
+
   beforeEach(async () => {
     vi.clearAllMocks();
 
@@ -74,10 +78,8 @@ describe('HeroListPage', () => {
           },
         },
         {
-          provide: MatSnackBar,
-          useValue: {
-            open: vi.fn(),
-          },
+          provide: NotificationService,
+          useValue: notificationServiceMock,
         },
       ],
     }).compileComponents();
@@ -88,7 +90,7 @@ describe('HeroListPage', () => {
 
     heroService = component['heroService'];
     dialog = component['dialog'];
-    snackBar = component['snackBar'];
+    notificationService = component['notificationService'];
 
     fixture.detectChanges();
   });
@@ -162,27 +164,24 @@ describe('HeroListPage', () => {
   it('should not delete hero when dialog is cancelled', () => {
     vi.spyOn(dialog, 'open').mockReturnValue(createDialogRef(false));
 
-    const snackBarSpy = vi.spyOn(snackBar, 'open');
+    const notificationSpy = vi.spyOn(notificationService, 'show');
 
     component['deleteHero'](heroes[0]);
 
     expect(heroService.delete).not.toHaveBeenCalled();
-
-    expect(snackBarSpy).not.toHaveBeenCalled();
+    expect(notificationSpy).not.toHaveBeenCalled();
   });
 
   it('should delete hero when dialog is confirmed', () => {
     vi.spyOn(dialog, 'open').mockReturnValue(createDialogRef(true));
 
-    const snackBarSpy = vi.spyOn(snackBar, 'open');
+    const notificationSpy = vi.spyOn(notificationService, 'show');
 
     component['deleteHero'](heroes[0]);
 
     expect(heroService.delete).toHaveBeenCalledWith('1');
 
-    expect(snackBarSpy).toHaveBeenCalledWith('Héroe eliminado correctamente', 'Cerrar', {
-      duration: 3000,
-    });
+    expect(notificationSpy).toHaveBeenCalledWith('Héroe eliminado correctamente');
   });
 });
 

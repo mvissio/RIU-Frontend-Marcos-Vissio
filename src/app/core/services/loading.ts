@@ -4,15 +4,15 @@ import { computed, Injectable, signal } from '@angular/core';
   providedIn: 'root',
 })
 export class LoadingService {
-  private readonly activeRequests = signal(0);
+  private readonly _activeRequests = signal(0);
 
-  readonly loading = computed(() => this.activeRequests() > 0);
+  readonly loading = computed(() => this._activeRequests() > 0);
 
   show(): void {
-    this.activeRequests.update((count) => count + 1);
+    this._activeRequests.update((count) => count + 1);
   }
 
   hide(): void {
-    this.activeRequests.update((count) => Math.max(count - 1, 0));
+    this._activeRequests.update((count) => Math.max(count - 1, 0));
   }
 }

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { CreateHero } from '../../../../core/models/hero.model';
 import { HeroService } from '../../../../core/services/hero';
+import { NotificationService } from '../../../../core/services/notification';
 import { HeroFormPage } from './hero-form-page';
 
 describe('HeroFormPage', () => {
@@ -15,8 +15,8 @@ describe('HeroFormPage', () => {
     navigate: vi.fn().mockResolvedValue(true),
   };
 
-  const snackBar = {
-    open: vi.fn(),
+  const notificationService = {
+    show: vi.fn(),
   };
 
   const hero: CreateHero = {
@@ -49,9 +49,7 @@ describe('HeroFormPage', () => {
 
   afterEach(() => {
     router.navigate.mockClear();
-
-    snackBar.open.mockClear();
-
+    notificationService.show.mockClear();
     heroServiceMock.getById.mockClear();
     heroServiceMock.create.mockClear();
     heroServiceMock.update.mockClear();
@@ -74,9 +72,7 @@ describe('HeroFormPage', () => {
 
     expect(heroServiceMock.create).toHaveBeenCalledWith(hero);
 
-    expect(snackBar.open).toHaveBeenCalledWith('Héroe creado correctamente', 'Cerrar', {
-      duration: 3000,
-    });
+    expect(notificationService.show).toHaveBeenCalledWith('Héroe creado correctamente');
 
     expect(router.navigate).toHaveBeenCalledWith(['/heroes']);
   });
@@ -98,9 +94,7 @@ describe('HeroFormPage', () => {
       }),
     );
 
-    expect(snackBar.open).toHaveBeenCalledWith('Héroe actualizado correctamente', 'Cerrar', {
-      duration: 3000,
-    });
+    expect(notificationService.show).toHaveBeenCalledWith('Héroe actualizado correctamente');
 
     expect(router.navigate).toHaveBeenCalledWith(['/heroes']);
   });
@@ -114,9 +108,7 @@ describe('HeroFormPage', () => {
 
     component['onSave'](hero);
 
-    expect(snackBar.open).toHaveBeenCalledWith('No se pudo actualizar el héroe', 'Cerrar', {
-      duration: 3000,
-    });
+    expect(notificationService.show).toHaveBeenCalledWith('No se pudo actualizar el héroe');
 
     expect(router.navigate).not.toHaveBeenCalled();
   });
@@ -136,9 +128,7 @@ describe('HeroFormPage', () => {
       id: 'unknown-id',
     });
 
-    expect(snackBar.open).toHaveBeenCalledWith('El héroe no existe', 'Cerrar', {
-      duration: 3000,
-    });
+    expect(notificationService.show).toHaveBeenCalledWith('El héroe no existe');
 
     expect(router.navigate).toHaveBeenCalledWith(['/heroes']);
   });
@@ -146,7 +136,7 @@ describe('HeroFormPage', () => {
   async function createComponent(params: Record<string, string> = {}): Promise<void> {
     router.navigate.mockClear();
 
-    snackBar.open.mockClear();
+    notificationService.show.mockClear();
 
     await TestBed.configureTestingModule({
       imports: [HeroFormPage],
@@ -155,6 +145,11 @@ describe('HeroFormPage', () => {
         {
           provide: HeroService,
           useValue: heroServiceMock,
+        },
+
+        {
+          provide: NotificationService,
+          useValue: notificationService,
         },
 
         {
@@ -171,13 +166,7 @@ describe('HeroFormPage', () => {
           useValue: router,
         },
       ],
-    })
-
-      .overrideProvider(MatSnackBar, {
-        useValue: snackBar,
-      })
-
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HeroFormPage);
 

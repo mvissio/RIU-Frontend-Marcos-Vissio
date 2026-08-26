@@ -14,4 +14,12 @@
     justify-content: flex-end;
     gap: styles.$spacing-sm;
   }
+
+  @include styles.mobile {
+
+    &__actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+  }
 }

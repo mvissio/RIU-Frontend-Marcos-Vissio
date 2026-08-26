@@ -14,3 +14,9 @@
   gap: vars.$spacing-md;
   margin-bottom: vars.$spacing-lg;
 }
+
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}

@@ -1,5 +1,7 @@
 # Heroes Challenge
 
+[![CI](https://github.com/mvissio/RIU-Frontend-Marcos-Vissio/actions/workflows/ci.yml/badge.svg)](https://github.com/mvissio/RIU-Frontend-Marcos-Vissio/actions/workflows/ci.yml)
+
 Aplicación SPA desarrollada en Angular para la gestión de superhéroes.
 
 Permite listar, buscar, crear, editar y eliminar superhéroes mediante una arquitectura basada en componentes y servicios Angular.
@@ -8,12 +10,20 @@ La aplicación funciona por defecto utilizando datos en memoria dentro de `HeroS
 
 Adicionalmente, se incorporó una implementación opcional utilizando `json-server` y `HttpClient` para poder ejecutar la misma aplicación contra una Mock API.
 
+## Demo
+
+La aplicación se encuentra publicada en GitHub Pages:
+
+[Ver Heroes Challenge](https://mvissio.github.io/RIU-Frontend-Marcos-Vissio/)
+
+La versión publicada utiliza la implementación en memoria, por lo que no requiere que la Mock API esté disponible.
+
 ## Tech Stack
 
 - Angular 22
 - TypeScript
 - Angular Material
-- Singals
+- Signals
 - RxJS
 - Vitest
 - V8 Coverage
@@ -94,27 +104,13 @@ mock-api/db.json
 
 #### Ejecución de la Mock API
 
-Para utilizar la implementación HTTP es necesario levantar `json-server` y la aplicación Angular con la configuración `api`.
-
-En una primera terminal:
-
-```bash
-npm run api
-```
-
-Esto levanta `json-server` utilizando:
-
-```text
-mock-api/db.json
-```
-
-En una segunda terminal:
+Para levantar `json-server` y la aplicación Angular con la configuración `api`, ejecutar:
 
 ```bash
 npm run start:api
 ```
 
-En este modo, `HeroService` es reemplazado por `HeroApiService` mediante Dependency Injection y las operaciones CRUD se realizan utilizando HTTP.
+Este comando inicia ambos procesos. En este modo, `HeroService` es reemplazado por `HeroApiService` mediante Dependency Injection y las operaciones CRUD se realizan utilizando HTTP sobre los datos de `mock-api/db.json`.
 
 La ejecución normal:
 
@@ -150,7 +146,26 @@ Incluye pruebas para:
 - Interceptores.
 - Flujos principales de la aplicación.
 
-La cobertura actual supera el mínimo solicitado del 80%.
+La suite cuenta con 58 tests y la cobertura supera el mínimo solicitado del 80%.
+
+## Integración continua y despliegue
+
+El workflow `.github/workflows/ci.yml` se ejecuta automáticamente ante cada `push` y `pull request` sobre `main`. También puede iniciarse manualmente desde la pestaña **Actions** de GitHub.
+
+El job de calidad realiza las siguientes validaciones:
+
+- Instalación reproducible de dependencias mediante `npm ci`.
+- Verificación de formato con Prettier.
+- Auditoría de vulnerabilidades críticas.
+- Ejecución de tests con cobertura.
+- Compilación de producción de la aplicación.
+
+Cada ejecución publica durante 7 días dos artefactos descargables desde GitHub Actions:
+
+- `coverage-report`: reporte HTML de cobertura.
+- `application-build`: aplicación Angular compilada.
+
+Cuando todas las validaciones finalizan correctamente en la rama `main`, el job de deploy compila la aplicación con la ruta base del repositorio y la publica automáticamente en GitHub Pages. Los pull requests solo ejecutan las validaciones y no realizan despliegues.
 
 ## Project Structure
 
@@ -183,6 +198,9 @@ docker/
 ├── Dockerfile
 ├── docker-compose.yml
 └── nginx.conf
+
+.github/workflows/
+└── ci.yml
 ```
 
 # Ejecución del proyecto
@@ -209,13 +227,7 @@ La aplicación estará disponible mediante Angular CLI.
 
 ## Ejecución local con Mock API
 
-Levantar `json-server`:
-
-```bash
-npm run api
-```
-
-En otra terminal, iniciar Angular utilizando la configuración API:
+Iniciar conjuntamente `json-server` y Angular con la configuración API:
 
 ```bash
 npm run start:api

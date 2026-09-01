@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { LoadingService } from '../../../core/services/loading';
@@ -8,6 +8,7 @@ import { LoadingService } from '../../../core/services/loading';
   imports: [MatProgressBarModule],
   templateUrl: './loading.html',
   styleUrl: './loading.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingComponent {
   protected readonly loadingService = inject(LoadingService);

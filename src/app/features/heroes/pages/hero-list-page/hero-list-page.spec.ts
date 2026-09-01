@@ -88,9 +88,9 @@ describe('HeroListPage', () => {
 
     component = fixture.componentInstance;
 
-    heroService = component['heroService'];
-    dialog = component['dialog'];
-    notificationService = component['notificationService'];
+    heroService = component['_heroService'];
+    dialog = component['_dialog'];
+    notificationService = component['_notificationService'];
 
     fixture.detectChanges();
   });
@@ -110,29 +110,26 @@ describe('HeroListPage', () => {
     expect(element.textContent).toContain('Batman');
   });
 
-  it('should filter heroes by name', () => {
+  it('should filter heroes by name', async () => {
     const input = fixture.nativeElement.querySelector('input[type="search"]') as HTMLInputElement;
+    const element = fixture.nativeElement as HTMLElement;
 
     input.value = 'bat';
     input.dispatchEvent(new Event('input'));
 
-    fixture.detectChanges();
-
-    const element = fixture.nativeElement as HTMLElement;
+    await fixture.whenStable();
 
     expect(element.textContent).toContain('Batman');
     expect(element.textContent).not.toContain('Superman');
   });
 
-  it('should reset page index when searching', () => {
+  it('should reset page index when searching', async () => {
     component['pageIndex'].set(2);
 
     const input = fixture.nativeElement.querySelector('input[type="search"]') as HTMLInputElement;
 
     input.value = 'bat';
     input.dispatchEvent(new Event('input'));
-
-    fixture.detectChanges();
 
     expect(component['pageIndex']()).toBe(0);
   });

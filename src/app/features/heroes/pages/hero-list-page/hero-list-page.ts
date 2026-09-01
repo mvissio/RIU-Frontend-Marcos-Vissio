@@ -7,6 +7,8 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,17 +17,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { distinctUntilChanged, filter, map, Observable, startWith, switchMap, tap } from 'rxjs';
 
 import { Hero } from '../../../../core/models/hero.model';
 import { HeroService } from '../../../../core/services/hero';
-import { HeroDeleteDialog } from '../../components/hero-delete-dialog/hero-delete-dialog';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, switchMap } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification';
+import { HeroDeleteDialog } from '../../components/hero-delete-dialog/hero-delete-dialog';
 
 @Component({
   selector: 'app-hero-list-page',
   imports: [
+    ReactiveFormsModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -45,6 +47,10 @@ export class HeroListPage implements OnInit {
   private readonly _notificationService = inject(NotificationService);
   private readonly _destroyRef = inject(DestroyRef);
 
+  protected readonly searchControl = new FormControl('', {
+    nonNullable: true,
+  });
+
   protected readonly searchTerm = signal('');
   protected readonly pageIndex = signal(0);
   protected readonly pageSize = signal(5);
@@ -52,24 +58,32 @@ export class HeroListPage implements OnInit {
 
   protected readonly displayedColumns = ['name', 'realName', 'universe', 'powers', 'actions'];
 
-  ngOnInit(): void {
-    this._loadHeroes();
-  }
-
   protected readonly paginatedHeroes = computed(() => {
     const heroes = this.heroes();
     const pageSize = this.pageSize();
     const maxPageIndex = Math.max(Math.ceil(heroes.length / pageSize) - 1, 0);
     const currentPageIndex = Math.min(this.pageIndex(), maxPageIndex);
     const start = currentPageIndex * pageSize;
+
     return heroes.slice(start, start + pageSize);
   });
 
-  protected onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.pageIndex.set(0);
-    this.searchTerm.set(input.value);
-    this._loadHeroes(input.value);
+  ngOnInit(): void {
+    this.searchControl.valueChanges
+      .pipe(
+        startWith(this.searchControl.value),
+        map((searchTerm) => searchTerm.trim()),
+        distinctUntilChanged(),
+        tap((searchTerm) => {
+          this.pageIndex.set(0);
+          this.searchTerm.set(searchTerm);
+        }),
+        switchMap((searchTerm) => this._getHeroes(searchTerm)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((heroes) => {
+        this.heroes.set(heroes);
+      });
   }
 
   protected onPageChange(event: PageEvent): void {
@@ -88,6 +102,7 @@ export class HeroListPage implements OnInit {
   protected deleteHero(hero: Hero): void {
     const dialogRef = this._dialog.open(HeroDeleteDialog, {
       width: '420px',
+      maxWidth: '90vw',
       data: hero,
     });
 
@@ -96,29 +111,26 @@ export class HeroListPage implements OnInit {
       .pipe(
         filter((confirmed) => confirmed),
         switchMap(() => this._heroService.delete(hero.id)),
+        switchMap(() => this._getHeroes(this.searchTerm())),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(() => {
-        this._loadHeroes(this.searchTerm());
+      .subscribe((heroes) => {
+        this.heroes.set(heroes);
         this._adjustCurrentPage();
         this._notificationService.show('Héroe eliminado correctamente');
       });
   }
+
   private _adjustCurrentPage(): void {
     const totalHeroes = this.heroes().length;
     const lastPageIndex = Math.max(Math.ceil(totalHeroes / this.pageSize()) - 1, 0);
+
     if (this.pageIndex() > lastPageIndex) {
       this.pageIndex.set(lastPageIndex);
     }
   }
 
-  private _loadHeroes(searchTerm = ''): void {
-    const heroes$ = searchTerm.trim()
-      ? this._heroService.searchByName(searchTerm)
-      : this._heroService.getAll();
-
-    heroes$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((heroes) => {
-      this.heroes.set(heroes);
-    });
+  private _getHeroes(searchTerm: string): Observable<Hero[]> {
+    return searchTerm ? this._heroService.searchByName(searchTerm) : this._heroService.getAll();
   }
 }
